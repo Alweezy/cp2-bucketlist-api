@@ -12,6 +12,7 @@ class Config(object):
 class DevelopmentConfig(Config):
     """Configurations for Development."""
     DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/flask_api'
 
 
 class TestingConfig(Config):
