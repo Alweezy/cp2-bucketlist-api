@@ -9,7 +9,7 @@ db = SQLAlchemy()
 
 
 def create_app(config_name):
-    from app.models import Bucketlist
+    from app.models import BucketList
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
@@ -21,7 +21,7 @@ def create_app(config_name):
         if request.method == "POST":
             name = str(request.data.get('name', ''))
             if name:
-                bucketlist = Bucketlist(name=name)
+                bucketlist = BucketList(name=name)
                 bucketlist.save()
                 response = jsonify({
                     'id': bucketlist.id,
@@ -33,7 +33,7 @@ def create_app(config_name):
                 return response
         else:
             # GET
-            bucketlists = Bucketlist.get_all()
+            bucketlists = BucketList.get_all()
             results = []
 
             for bucketlist in bucketlists:
@@ -51,7 +51,7 @@ def create_app(config_name):
     @app.route('/bucketlists/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     def bucketlist_manipulation(id, **kwargs):
         # retrieve a buckelist using it's ID
-        bucketlist = Bucketlist.query.filter_by(id=id).first()
+        bucketlist = BucketList.query.filter_by(id=id).first()
         if not bucketlist:
             # Raise an HTTPException with a 404 not found status code
             abort(404)
