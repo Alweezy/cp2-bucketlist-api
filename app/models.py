@@ -32,7 +32,7 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 
-class Bucketlist(db.Model):
+class BucketList(db.Model):
     """This class represents the bucketlist table."""
 
     __tablename__ = 'bucketlists'
@@ -54,14 +54,14 @@ class Bucketlist(db.Model):
 
     @staticmethod
     def get_all():
-        return Bucketlist.query.all()
+        return BucketList.query.all()
 
     def delete(self):
         db.session.delete(self)
         db.session.commit()
 
     def __repr__(self):
-        return "<Bucketlist: {}>".format(self.name)
+        return "<BucketList: {}>".format(self.name)
 
 
 class BucketListItem(db.Model):
@@ -74,7 +74,7 @@ class BucketListItem(db.Model):
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
                               onupdate=db.func.current_timestamp())
     done = db.Column(db.Boolean, default=False)
-    bucketlist_id = db.Column(db.Integer, db.ForeignKey(Bucketlist.id))
+    bucketlist_id = db.Column(db.Integer, db.ForeignKey(BucketList.id))
 
     def __init__(self, name, bucketlist_id):
         """Initialize with name and bucketlist_id"""
@@ -87,7 +87,7 @@ class BucketListItem(db.Model):
 
     @staticmethod
     def get_all_items():
-        return BucketListItem.query.filter_by(bucketlist_id=Bucketlist.id)
+        return BucketListItem.query.filter_by(bucketlist_id=BucketList.id)
 
     def delete(self):
         db.session.delete(self)
