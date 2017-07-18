@@ -1,5 +1,9 @@
+import datetime
+
+import jwt
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import current_app
 
 from app import db
 
@@ -25,11 +29,47 @@ class User(UserMixin, db.Model):
         raise AttributeError('You cannot access password')
 
     @password.setter
-    def password(self):
-        self.user_password = generate_password_hash(self.password)
+    def password(self, password):
+        self.user_password = generate_password_hash(password)
 
     def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.user_password, password)
+
+    def generate_auth_token(self, user_id):
+        """ Generates the access token"""
+
+        try:
+            # set up a payload with an expiration time
+            payload = {
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10),
+                'iat': datetime.datetime.utcnow(),
+                'sub': user_id
+            }
+            # create the byte string token using the payload and the SECRET key
+            jwt_string = jwt.encode(
+                payload,
+                current_app.config.get('SECRET_KEY'),
+                algorithm='HS256'
+            )
+            return jwt_string
+
+        except Exception as e:
+            # return an error in string format if an exception occurs
+            return str(e)
+
+    @staticmethod
+    def verify_token(token):
+        """Decodes the access token from the Authorization header."""
+        try:
+            # try to decode the token using our SECRET variable
+            payload = jwt.decode(token, current_app.config.get('SECRET_KEY'))
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            # the token is expired, return an error string
+            return "Expired token. Please login to get a new token."
+        except jwt.InvalidTokenError:
+            # the token is invalid, return an error string
+            return "Invalid token. Please register or login."
 
 
 class BucketList(db.Model):
@@ -45,9 +85,10 @@ class BucketList(db.Model):
         onupdate=db.func.current_timestamp())
     created_by = db.Column(db.Integer, db.ForeignKey(User.id))
 
-    def __init__(self, name):
+    def __init__(self, name, created_by):
         """initialize with name."""
         self.name = name
+        self.created_by = created_by
 
     def save(self):
         db.session.add(self)
