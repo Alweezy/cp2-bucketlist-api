@@ -110,7 +110,7 @@ class BucketListTestCase(unittest.TestCase):
                                  data=json.dumps(self.bucketlist),
                                  content_type="application/json",
                                  headers={
-                                    "Authorization": "invalid_token"
+                                    "Authorization": "invalid_toke"
                                  })
         self.assertEqual(res.status_code, 201)
         self.assertIn("Invalid token issued, register or log in ", str(res.data))

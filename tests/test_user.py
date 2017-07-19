@@ -21,10 +21,10 @@ class UserTest(unittest.TestCase):
 
     def test_registration_successful(self):
         """Test successful user registration."""
-        response = self.client.post("auth/register",
+        response = self.client().post("/auth/register/",
                                     data=json.dumps(self.user),
                                     content_type="application/json")
-        result = json.loads(response.data)
+        result = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result["message"],
                          'User registration successful.')
