@@ -71,6 +71,10 @@ class User(UserMixin, db.Model):
             # the token is invalid, return an error string
             return "Invalid token. Please register or login."
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
 
 class BucketList(db.Model):
     """This class represents the bucketlist table."""
