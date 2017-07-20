@@ -21,43 +21,42 @@ class UserTest(unittest.TestCase):
 
     def test_registration_successful(self):
         """Test successful user registration."""
-        response = self.client().post("/auth/register/",
-                                    data=json.dumps(self.user),
+        result = self.client().post("/auth/register/", data=json.dumps(self.user),
                                     content_type="application/json")
-        result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(result["message"],
+        results = json.loads(result.data.decode())
+
+        self.assertEqual(results["message"],
                          'User registration successful.')
-        self.assertEqual(result['username'],
-                         self.user['username'])
+        self.assertEqual(result.status_code, 201)
 
     def test_duplicate_user_registration(self):
         """Test registered user registration."""
-        resp = self.client().post('/auth/register/',
-                                  data=json.dumps(self.user),
-                                  content_type='application/json')
-        self.assertEqual(resp.status_code, 200)
-        res = self.client().post('/auth/register/',
-                                 data=json.dumps(self.user),
-                                 content_type='application/json')
-        self.assertEqual(res.status_code, 409)
-        result = json.loads(res.data)
-        self.assertEqual(result['message'],
-                         "User with the username already exists.")
+        res = self.client().post("/auth/register/", data=json.dumps(self.user),
+                                 content_type="application/json")
+        self.assertEqual(res.status_code, 201)
+
+        # Test double registration
+        res_2 = self.client().post("/auth/register/",
+                                   data=json.dumps(self.user),
+                                   content_type="application/json")
+        self.assertEqual(res_2.status_code, 409)
+        final_result = json.loads(res_2.data.decode())
+        self.assertEqual(final_result["message"],
+                         "User already exists. Please login")
 
     def test_login_successful(self):
         """Test successful user login."""
-        resp = self.client().post('/auth/register/',
-                                  data=json.dumps(self.user),
-                                  content_type="application/json")
-        self.assertEqual(resp.status_code, 200)
-        res = self.client().post('/auth/login/',
-                                 data=json.dumps(self.user),
+        res = self.client().post("/auth/register/", data=json.dumps(self.user),
                                  content_type="application/json")
-        self.assertEqual(res.status_code, 200)
-        result = json.loads(res.data)
-        self.assertEqual(result['message'],
-                         "Login successful.")
+        self.assertEqual(res.status_code, 201)
+
+        login_res = self.client().post("/auth/login/", data=json.dumps(self.user),
+                                       content_type="application/json")
+        results = json.loads(login_res.data.decode())
+        self.assertEqual(results["message"], "You logged in successfully.")
+        # Confirm the status code and access token
+        self.assertEqual(login_res.status_code, 200)
+        self.assertTrue(results["token"])
 
     def test_unauthorised_login_attempt(self):
         """Test unauthorised login attempt."""
@@ -67,16 +66,21 @@ class UserTest(unittest.TestCase):
         self.assertEqual(res.status_code, 401)
         result = json.loads(res.data)
         self.assertEqual(result['message'],
-                         "Invalid username/password.")
+                         'Invalid email or password. Please try again.')
 
     def test_incomplete_login_credentials(self):
         """Test partial issue of login credentials"""
-        res = self.client().post('/auth/login/',
-                                 data=json.dumps({"username": "nerd"}),
+        new_user = {"username": "",
+                    "password": "new_password"
+                    }
+
+        res = self.client().post("/auth/register/", data=json.dumps(new_user),
                                  content_type="application/json")
-        result = json.loads(res.data)
-        self.assertEqual(result['error'],
-                         "missing data in request.")
+        final_result = json.loads(res.data.decode())
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(final_result["message"],
+                         "Error. The username or password cannot be empty")
 
     def tearDown(self):
         """teardown all initialized variables."""
