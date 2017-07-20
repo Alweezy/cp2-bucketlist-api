@@ -2,6 +2,7 @@ from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, jsonify, abort
 
+
 from instance.config import app_config
 
 # initialize sql-alchemy
@@ -10,6 +11,7 @@ db = SQLAlchemy()
 
 def create_app(config_name):
     from app.models import BucketList, BucketListItem, User
+    from .auth_wrapper import evaluate_auth
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
@@ -17,6 +19,7 @@ def create_app(config_name):
     db.init_app(app)
 
     @app.route('/api/v1/bucketlists/', methods=['POST', 'GET'])
+    @evaluate_auth
     def bucketlists(user_id):
         if request.method == "POST":
             name = str(request.data.get('name', ''))
@@ -50,7 +53,8 @@ def create_app(config_name):
             return response
 
     @app.route('/api/v1/bucketlists/<int:id>', methods=['GET', 'PUT', 'DELETE'])
-    def bucketlist_manipulation(id, **kwargs):
+    @evaluate_auth
+    def bucketlist_manipulation(id, *args, **kwargs):
         # retrieve a buckelist using it's ID
         bucketlist = BucketList.query.filter_by(id=id).first()
         if not bucketlist:
@@ -101,5 +105,6 @@ def create_app(config_name):
             })
             response.status_code = 200
             return response
-
+    from app.auth import authenticate_blueprint
+    app.register_blueprint(authenticate_blueprint)
     return app
