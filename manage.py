@@ -7,7 +7,7 @@ from app import db, create_app
 from app import models
 
 if not os.getenv('APP_SETTINGS'):
-    config_name = "development"
+    config_name = "testing"
 else:
     config_name = os.getenv('APP_SETTINGS')
 
