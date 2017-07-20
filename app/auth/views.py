@@ -34,7 +34,7 @@ class SignUpView(MethodView):
                     user.save()
 
                     response = {
-                        "message": "You registered successfully. Log in."
+                        "message": 'User registration successful.'
                     }
 
                     return make_response(jsonify(response)), 201
@@ -62,16 +62,15 @@ class SignInView(MethodView):
             if request.data["username"] and request.data["password"]:
                 user = User.query.filter_by(
                     username=request.data["username"]).first()
-
                 # Authenticate the user using the password
-                if user and user.check_password(request.data["password"]):
+                if user and user.verify_password(request.data["password"]):
                     # Generate the access token which will be used
                     # as the authorization header
-                    access_token = user.generate_token(user.id)
-                    if access_token:
+                    token = user.generate_auth_token(user.id)
+                    if token:
                         response = {
                             "message": "You logged in successfully.",
-                            "access_token": access_token.decode()
+                            "token": token.decode()
                         }
 
                         return make_response(jsonify(response)), 200
@@ -110,7 +109,7 @@ login_view = SignInView.as_view("login_view")
 authenticate_blueprint.add_url_rule("/auth/register/", view_func=registration_view,
                                     methods=["POST"])
 
-# sign up  URL /auth/register/  rule definition and addition to blue print
+# sign up  URL /auth/login/  rule definition and addition to blue print
 authenticate_blueprint.add_url_rule("/auth/login/", view_func=login_view,
                                     methods=["POST"])
 
