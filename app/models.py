@@ -1,9 +1,9 @@
 import datetime
-
 import jwt
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app
+from instance.config import Config
 
 from app import db
 
@@ -48,7 +48,7 @@ class User(UserMixin, db.Model):
             # create the byte string token using the payload and the SECRET key
             jwt_string = jwt.encode(
                 payload,
-                current_app.config.get('SECRET_KEY'),
+                Config.SECRET_KEY,
                 algorithm='HS256'
             )
             return jwt_string
