@@ -1,8 +1,5 @@
 import os
 
-if not os.getenv('SECRET_KEY'):
-    os.environ['SECRET_KEY'] = str(os.urandom(24))
-
 
 class Config(object):
     """Parent configuration class."""
