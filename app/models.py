@@ -20,19 +20,32 @@ class User(UserMixin, db.Model):
                                   cascade="all,delete-orphan")
 
     def __init__(self, username, password, email):
+        """Initializes the user model
+        :param username: A string representing a user's username
+        :param password: A string representing the  user password
+        :param email: A string representing the user email
+        """
         self.username = username
         self.password = password
         self.email = email
 
     @property
     def password(self):
+        """Method prevents the access of password attribute externally"""
         raise AttributeError('You cannot access password')
 
     @password.setter
     def password(self, password):
+        """Generates a hash from the password entered by the user
+        :param password: A string representing the user password.
+        """
         self.user_password = generate_password_hash(password)
 
     def verify_password(self, password):
+        """Checks the user password against tje hash stored in the database
+        to valicate user.
+        :param password: A string representing the user password
+        """
         return check_password_hash(self.user_password, password)
 
     def generate_auth_token(self, user_id):
