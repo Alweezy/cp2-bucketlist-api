@@ -13,7 +13,7 @@ class BucketListTestCase(unittest.TestCase):
         self.client = self.app.test_client
         self.bucketlist = {'name': 'Go Skiing in the Himalayas'}
         self.bucketlist2 = {'name': 'Attend a BBQ at the Dojo'}
-        self.item = {'item': 'Remember to cary a camera'}
+        self.item = {'name': 'Remember to cary a camera'}
 
         # binds the app to the current context
         with self.app.app_context():
