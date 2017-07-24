@@ -85,6 +85,8 @@ class User(UserMixin, db.Model):
             return "Invalid token. Please register or login."
 
     def save(self):
+        """Saves a user to the database.
+        May be creating a user or updating an existing one."""
         db.session.add(self)
         db.session.commit()
 
