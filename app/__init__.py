@@ -37,20 +37,64 @@ def create_app(config_name):
                 return response
         else:
             # GET
-            bucketlists = BucketList.get_all()
+            # paginate bucketlist results
+            limit = request.args.get("limit")
+            if request.args.get("page"):
+                page = int(request.args.get("page"))
+            else:
+                # Assign page number arbitrarily if none is given
+                page = 1
+            if limit:
+                # use the limit issued with request
+                limit = int(request.args.get("limit"))
+            else:
+                # set limit otherwise
+                limit = 20
+            paginated_results = BucketList.query.filter_by(
+                created_by=user_id).paginate(page, limit, False)
+            if paginated_results.has_next:
+                    next_page = request.endpoint + '?page=' + str(
+                        page + 1) + '&limit=' + str(limit)
+            else:
+                next_page = ""
+            if paginated_results.has_prev:
+                    previous_page = request.endpoint + '?page=' + str(
+                        page - 1) + '&limit=' + str(limit)
+            else:
+                previous_page = ""
+
+            paginated_bucketlists = paginated_results.items
             results = []
 
-            for bucketlist in bucketlists:
-                obj = {
+            for bucketlist in paginated_bucketlists:
+                items = BucketListItem.query.filter_by(bucketlist_id=bucketlist.id)
+                items_list = []
+                for item in items:
+                    item_data = {"id": item.id,
+                                 "name": item.name,
+                                 "date_created": item.date_created,
+                                 "date_modified": item.date_modified,
+                                 "done": item.done
+                                 }
+                    items_list.append(item_data)
+
+                bucketlist_data = {
                     'id': bucketlist.id,
                     'name': bucketlist.name,
                     'date_created': bucketlist.date_created,
-                    'date_modified': bucketlist.date_modified
+                    'date_modified': bucketlist.date_modified,
+                    'items': items_list,
+                    'created_by': bucketlist.created_by
                 }
-                results.append(obj)
-            response = jsonify(results)
-            response.status_code = 200
-            return response
+                results.append(bucketlist_data)
+
+            response = {
+                        "next_page": next_page,
+                        "previous_page": previous_page,
+                        "bucketlists": results
+                    }
+
+            return make_response(jsonify(response)), 200
 
     @app.route('/api/v1/bucketlists/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     @evaluate_auth
