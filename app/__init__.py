@@ -44,7 +44,7 @@ def create_app(config_name):
             else:
                 # Assign page number arbitrarily if none is given
                 page = 1
-            if limit:
+            if limit and len(request.args.get("limit")):
                 # use the limit issued with request
                 limit = int(request.args.get("limit"))
             else:
