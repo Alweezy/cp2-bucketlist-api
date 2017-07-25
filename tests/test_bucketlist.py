@@ -13,7 +13,7 @@ class BucketListTestCase(unittest.TestCase):
         self.client = self.app.test_client
         self.bucketlist = {'name': 'Go Skiing in the Himalayas'}
         self.bucketlist2 = {'name': 'Attend a BBQ at the Dojo'}
-        self.item = {'item': 'Remember to cary a camera'}
+        self.item = {'name': 'Remember to cary a camera'}
 
         # binds the app to the current context
         with self.app.app_context():
@@ -147,6 +147,31 @@ class BucketListTestCase(unittest.TestCase):
                                 content_type="application/json",
                                 headers={"Authorization": self.token})
         self.assertEqual(res.status_code, 404)
+
+    def test_pagination_successful(self):
+        """Test the API pagination works fine"""
+        res = self.client().post('/api/v1/bucketlists/',
+                                 data=json.dumps(self.bucketlist),
+                                 content_type="application/json", headers={
+                                    "Authorization": self.token
+                                 })
+        self.assertEqual(res.status_code, 201)
+        result = self.client().get('/api/v1/bucketlists/?limit=20',
+                                   headers={"Authorization": self.token})
+        json_results = json.loads(result.data.decode("utf-8").
+                                  replace("'", "\""))
+        self.assertEqual(result.status_code, 200)
+        self.assertIn("next_page", str(result.data))
+        self.assertIn("previous_page", str(result.data))
+        self.assertIn("Go Skiing", str(result.data))
+        self.assertTrue(json_results["bucketlists"])
+
+    def test_pagination_invalid_credentials(self):
+        """Test API pagination fails with invalid credentials."""
+        result = self.client().get('/api/v1/bucketlists/?limit=20')
+        self.assertEqual(result.status_code, 401)
+        self.assertIn("Register or log in to access this resource",
+                      str(result.data))
 
     def tearDown(self):
         """teardown all initialized variables."""
