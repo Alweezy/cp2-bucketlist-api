@@ -37,64 +37,100 @@ def create_app(config_name):
                 return response
         else:
             # GET
-            # paginate bucketlist results
-            limit = request.args.get("limit")
-            if request.args.get("page"):
-                page = int(request.args.get("page"))
-            else:
-                # Assign page number arbitrarily if none is given
-                page = 1
-            if limit and len(request.args.get("limit")):
-                # use the limit issued with request
-                limit = int(request.args.get("limit"))
-            else:
-                # set limit otherwise
-                limit = 20
-            paginated_results = BucketList.query.filter_by(
-                created_by=user_id).paginate(page, limit, False)
-            if paginated_results.has_next:
-                    next_page = request.endpoint + '?page=' + str(
-                        page + 1) + '&limit=' + str(limit)
-            else:
-                next_page = ""
-            if paginated_results.has_prev:
-                    previous_page = request.endpoint + '?page=' + str(
-                        page - 1) + '&limit=' + str(limit)
-            else:
-                previous_page = ""
+            search = str(request.args.get("q", ""))
+            if search:
+                search_query = BucketList.query.filter(
+                    BucketList.name.contains(search)).all()
+                if search_query:
+                    search_results = []
+                    for bucketlist in search_query:
+                        items = BucketListItem.query.filter_by(
+                            bucketlist_id=bucketlist.id)
+                        items_list = []
+                        for item in items:
+                            item_data = {"id": item.id,
+                                         "name": item.name,
+                                         "date_created": item.date_created,
+                                         "date_modified": item.date_modified,
+                                         "done": item.done
+                                         }
+                            items_list.append(item_data)
 
-            paginated_bucketlists = paginated_results.items
-            results = []
+                        bucketlist_data = {
+                            'id': bucketlist.id,
+                            'name': bucketlist.name,
+                            'date_created': bucketlist.date_created,
+                            'date_modified': bucketlist.date_modified,
+                            'items': items_list,
+                            'created_by': bucketlist.created_by
+                        }
+                        search_results.append(bucketlist_data)
 
-            for bucketlist in paginated_bucketlists:
-                items = BucketListItem.query.filter_by(bucketlist_id=bucketlist.id)
-                items_list = []
-                for item in items:
-                    item_data = {"id": item.id,
-                                 "name": item.name,
-                                 "date_created": item.date_created,
-                                 "date_modified": item.date_modified,
-                                 "done": item.done
-                                 }
-                    items_list.append(item_data)
-
-                bucketlist_data = {
-                    'id': bucketlist.id,
-                    'name': bucketlist.name,
-                    'date_created': bucketlist.date_created,
-                    'date_modified': bucketlist.date_modified,
-                    'items': items_list,
-                    'created_by': bucketlist.created_by
-                }
-                results.append(bucketlist_data)
-
-            response = {
-                        "next_page": next_page,
-                        "previous_page": previous_page,
-                        "bucketlists": results
+                    return make_response(jsonify(search_results)), 200
+                else:
+                    res = {
+                        "message": "Specified bucketlist is not available"
                     }
+                    return make_response(jsonify(res)), 404
+            else:
+                # paginate bucketlist results
+                limit = request.args.get("limit")
+                if request.args.get("page"):
+                    page = int(request.args.get("page"))
+                else:
+                    # Assign page number arbitrarily if none is given
+                    page = 1
+                if limit and len(request.args.get("limit")):
+                    # use the limit issued with request
+                    limit = int(request.args.get("limit"))
+                else:
+                    # set limit otherwise
+                    limit = 20
+                paginated_results = BucketList.query.filter_by(
+                    created_by=user_id).paginate(page, limit, False)
+                if paginated_results.has_next:
+                        next_page = request.endpoint + '?page=' + str(
+                            page + 1) + '&limit=' + str(limit)
+                else:
+                    next_page = ""
+                if paginated_results.has_prev:
+                        previous_page = request.endpoint + '?page=' + str(
+                            page - 1) + '&limit=' + str(limit)
+                else:
+                    previous_page = ""
 
-            return make_response(jsonify(response)), 200
+                paginated_bucketlists = paginated_results.items
+                results = []
+
+                for bucketlist in paginated_bucketlists:
+                    items = BucketListItem.query.filter_by(bucketlist_id=bucketlist.id)
+                    items_list = []
+                    for item in items:
+                        item_data = {"id": item.id,
+                                     "name": item.name,
+                                     "date_created": item.date_created,
+                                     "date_modified": item.date_modified,
+                                     "done": item.done
+                                     }
+                        items_list.append(item_data)
+
+                    bucketlist_data = {
+                        'id': bucketlist.id,
+                        'name': bucketlist.name,
+                        'date_created': bucketlist.date_created,
+                        'date_modified': bucketlist.date_modified,
+                        'items': items_list,
+                        'created_by': bucketlist.created_by
+                    }
+                    results.append(bucketlist_data)
+
+                response = {
+                            "next_page": next_page,
+                            "previous_page": previous_page,
+                            "bucketlists": results
+                        }
+
+                return make_response(jsonify(response)), 200
 
     @app.route('/api/v1/bucketlists/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     @evaluate_auth
