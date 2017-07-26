@@ -173,6 +173,34 @@ class BucketListTestCase(unittest.TestCase):
         self.assertIn("Register or log in to access this resource",
                       str(result.data))
 
+    def test_bucketlist_search_successful(self):
+        """Test API search executes successfully."""
+        res = self.client().post('/api/v1/bucketlists/',
+                                 data=json.dumps(self.bucketlist),
+                                 content_type="application/json", headers={
+                                    "Authorization": self.token
+                                 })
+        self.assertEqual(res.status_code, 201)
+        res = self.client().get('/api/v1/bucketlists/?q=Go',
+                                content_type="application/json",
+                                headers={"Authorization": self.token})
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('Go Skiing', str(res.data))
+
+    def test_bucketlist_search_invalid_credentials(self):
+        res = self.client().post('/api/v1/bucketlists/',
+                                 data=json.dumps(self.bucketlist),
+                                 content_type="application/json", headers={
+                                    "Authorization": self.token
+                                 })
+        self.assertEqual(res.status_code, 201)
+        res = self.client().get('/api/v1/bucketlists/?q=Go',
+                                content_type="application/json",
+                                headers={"Authorization": "invalid_token"})
+        self.assertEqual(res.status_code, 401)
+        self.assertIn("Invalid token. Please register or login.",
+                      str(res.data))
+
     def tearDown(self):
         """teardown all initialized variables."""
         with self.app.app_context():
