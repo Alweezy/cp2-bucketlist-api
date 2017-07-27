@@ -1,6 +1,6 @@
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
-from flask import request, jsonify, abort, make_response
+from flask import request, jsonify, abort, make_response, render_template
 
 
 from instance.config import app_config
@@ -13,10 +13,15 @@ def create_app(config_name):
     from app.models import BucketList, BucketListItem, User
     from .auth_wrapper import evaluate_auth
     app = FlaskAPI(__name__, instance_relative_config=True)
+    app.url_map.strict_slashes = False
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
+
+    @app.route('/', methods=['GET'])
+    def index():
+        return render_template('index.html')
 
     @app.route('/api/v1/bucketlists/', methods=['POST', 'GET'])
     @evaluate_auth
@@ -139,7 +144,7 @@ def create_app(config_name):
         bucketlist = BucketList.query.filter_by(id=id).first()
         if not bucketlist:
             # Raise an HTTPException with a 404 not found status code
-            abort(404)
+            abort(jsonify({"message": "Bucketlist does not exist."}))
 
         if request.method == 'DELETE':
             bucketlist.delete()

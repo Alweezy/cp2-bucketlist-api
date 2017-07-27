@@ -122,7 +122,8 @@ class BucketListTestCase(unittest.TestCase):
         res = self.client().get('/api/v1/bucketlists/1',
                                 content_type="application/json",
                                 headers={"Authorization": self.token})
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(json.loads(res.data)["message"], "Bucketlist does not exist.")
 
     def test_submit_request_with_invalid_credentials(self):
         """Test user issuing an invalid token. """
@@ -146,7 +147,7 @@ class BucketListTestCase(unittest.TestCase):
         res = self.client().get('/api/v1/bucketlists/3',
                                 content_type="application/json",
                                 headers={"Authorization": self.token})
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 200)
 
     def test_pagination_successful(self):
         """Test the API pagination works fine"""
