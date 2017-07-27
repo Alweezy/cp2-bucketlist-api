@@ -242,8 +242,7 @@ def create_app(config_name):
             response = jsonify({
                 "message": "Item {} has been successfully deleted"
                 .format(item.name)})
-            response.status_code = 204
-            return response
+            return make_response(response), 200
 
         elif request.method == "PUT":
             name = str(request.data.get("name", ""))
