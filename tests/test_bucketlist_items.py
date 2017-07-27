@@ -95,7 +95,8 @@ class BucketListTestCase(unittest.TestCase):
         result = self.client().get('/api/v1/bucketlists/1/items/1', headers={
             "Authorization": self.token
         })
-        self.assertEqual(result.status_code, 404)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(json.loads(result.data)["message"], "Bucketlist item does not exist.")
 
     def test_submit_request_with_invalid_credentials(self):
         """Test user issuing an invalid token. """
@@ -114,7 +115,8 @@ class BucketListTestCase(unittest.TestCase):
         result = self.client().get('/api/v1/bucketlists/1/items/3', headers={
             "Authorization": self.token
         })
-        self.assertEqual(result.status_code, 404)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(json.loads(result.data)["message"], "Bucketlist item does not exist.")
 
     def tearDown(self):
         """teardown all initialized variables."""
