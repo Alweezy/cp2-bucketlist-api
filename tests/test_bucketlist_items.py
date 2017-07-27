@@ -90,7 +90,8 @@ class BucketListTestCase(unittest.TestCase):
         result = self.client().delete('/api/v1/bucketlists/1/items/1', headers={
             "Authorization": self.token
         })
-        self.assertEqual(result.status_code, 204)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn("has been successfully deleted", str(result.data))
         # Test to see if it exists, should return a 404
         result = self.client().get('/api/v1/bucketlists/1/items/1', headers={
             "Authorization": self.token
