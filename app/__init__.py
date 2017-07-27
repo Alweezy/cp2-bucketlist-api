@@ -196,7 +196,7 @@ def create_app(config_name):
     def bucketlist_items(id, user_id, *args, **kwargs):
         bucketlist = BucketList.query.filter_by(id=id).first()
         if not bucketlist:
-            abort(404)
+            abort(jsonify({"message": "Bucketlist does not exist."}))
 
         if request.method == 'GET':
             items = BucketListItem.query.filter_by(bucketlist_id=id)
@@ -235,7 +235,7 @@ def create_app(config_name):
         item = BucketListItem.query.filter_by(bucketlist_id=id).filter_by(
             id=item_id).first()
         if not item:
-            abort(404)
+             abort(jsonify({"message": "Bucketlist item does not exist."}))
 
         if request.method == "DELETE":
             item.delete()
