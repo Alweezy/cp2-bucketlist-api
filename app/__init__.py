@@ -146,9 +146,9 @@ def create_app(config_name):
 
     @app.route('/api/v1/bucketlists/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     @evaluate_auth
-    def bucketlist_manipulation(id, *args, **kwargs):
+    def bucketlist_manipulation(id, user_id, *args, **kwargs):
         # retrieve a buckelist using it's ID
-        bucketlist = BucketList.query.filter_by(id=id).first()
+        bucketlist = BucketList.query.filter_by(id=id, created_by=user_id).first()
         if not bucketlist:
             # Raise an HTTPException with a 404 not found status code
             abort(jsonify({"message": "Bucketlist does not exist."}))
@@ -201,7 +201,7 @@ def create_app(config_name):
     @app.route('/api/v1/bucketlists/<int:id>/items/', methods=['GET', 'POST'])
     @evaluate_auth
     def bucketlist_items(id, user_id, *args, **kwargs):
-        bucketlist = BucketList.query.filter_by(id=id).first()
+        bucketlist = BucketList.query.filter_by(id=id, created_by=user_id).first()
         if not bucketlist:
             abort(jsonify({"message": "Bucketlist does not exist."}))
 
@@ -239,10 +239,13 @@ def create_app(config_name):
     @app.route('/api/v1/bucketlists/<int:id>/items/<int:item_id>', methods=['GET', 'PUT', 'DELETE'])
     @evaluate_auth
     def bucketlist_item_manipulation(id, item_id, user_id, *atgs, **kwargs):
+        user = BucketList.query.filter_by(created_by=user_id).first()
+        if not user:
+            abort(jsonify({"message": "Bucketlist item does not exist or you don't own it."}))
         item = BucketListItem.query.filter_by(bucketlist_id=id).filter_by(
             id=item_id).first()
         if not item:
-             abort(jsonify({"message": "Bucketlist item does not exist."}))
+            abort(jsonify({"message": "Bucketlist item does not exist."}))
 
         if request.method == "DELETE":
             item.delete()
