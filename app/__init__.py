@@ -29,23 +29,30 @@ def create_app(config_name):
         if request.method == "POST":
             name = str(request.data.get('name', ''))
             if name:
-                bucketlist = BucketList(name=name, created_by=user_id)
-                bucketlist.save()
-                response = jsonify({
-                    'id': bucketlist.id,
-                    'name': bucketlist.name,
-                    'date_created': bucketlist.date_created,
-                    'date_modified': bucketlist.date_modified,
-                    'created_by': user_id
-                })
-                response.status_code = 201
-                return response
+                bucketlist = BucketList.query.filter_by(name=name, created_by=user_id).first()
+                if not bucketlist:
+                    bucketlist = BucketList(name=name, created_by=user_id)
+                    bucketlist.save()
+                    response = jsonify({
+                        'id': bucketlist.id,
+                        'name': bucketlist.name,
+                        'date_created': bucketlist.date_created,
+                        'date_modified': bucketlist.date_modified,
+                        'created_by': user_id
+                    })
+                    response.status_code = 201
+                    return response
+                else:
+                    res = {
+                        "message": "User already has a bucketlist by that name"
+                    }
+                    return make_response(jsonify(res)), 200
         else:
             # GET
             search = str(request.args.get("q", ""))
             if search:
-                search_query = BucketList.query.filter(
-                    BucketList.name.contains(search)).all()
+                search_query = BucketList.query.filter_by(created_by=user_id).filter(
+                    BucketList.name.ilike('%'+search+'%')).all()
                 if search_query:
                     search_results = []
                     for bucketlist in search_query:
