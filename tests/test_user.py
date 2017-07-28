@@ -16,7 +16,7 @@ class UserTest(unittest.TestCase):
             db.create_all()
             self.user = {"username": "nerd",
                          "password": "nerdy",
-                         "email": "nerd@tests.com "
+                         "email": "nerd@gmail.com"
                          }
 
     def test_registration_successful(self):

@@ -1,9 +1,13 @@
 from flask.views import MethodView
 from flask import jsonify, request, make_response
 
+import re
+
 
 from . import authenticate_blueprint
 from app.models import User
+
+EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 
 
 class SignUpView(MethodView):
@@ -11,7 +15,7 @@ class SignUpView(MethodView):
 
     def post(self):
         """for requests of kind post from /auth/register/"""
-        if request.data["username"] and request.data["password"]:
+        if request.data["username"].strip() and request.data["password"].strip():
             user = User.query.filter_by(
                 username=request.data["username"]).first()
             if user:
@@ -29,15 +33,22 @@ class SignUpView(MethodView):
                     username = data["username"]
                     password = data["password"]
                     email = data["email"]
-                    user = User(username=username, password=password,
-                                email=email)
-                    user.save()
+                    if email and EMAIL_REGEX.match(email):
+                        user = User(username=username, password=password,
+                                    email=email)
+                        user.save()
 
-                    response = {
-                        "message": 'User registration successful.'
-                    }
+                        response = {
+                            "message": 'User registration successful.'
+                        }
 
-                    return make_response(jsonify(response)), 201
+                        return make_response(jsonify(response)), 201
+                    else:
+                        response = {
+                            "message": 'Cannot register with invalid email.'
+                        }
+
+                        return make_response(jsonify(response)), 400
 
                 except Exception as e:
                     response = {
@@ -59,7 +70,7 @@ class SignInView(MethodView):
     def post(self):
         """for requests of kind post from /auth/login/"""
         try:
-            if request.data["username"] and request.data["password"]:
+            if request.data["username"].strip() and request.data["password"].strip():
                 user = User.query.filter_by(
                     username=request.data["username"]).first()
                 # Authenticate the user using the password
