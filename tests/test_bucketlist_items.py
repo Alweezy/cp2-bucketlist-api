@@ -1,8 +1,12 @@
 import unittest
 import json
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 
 from app import db
-from app.app import app
+from app.views import app
 from instance.config import app_config
 
 
