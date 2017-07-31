@@ -105,16 +105,22 @@ class BucketList(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey(User.id))
 
     def __init__(self, name, created_by):
-        """initialize with name."""
+        """Initializes  with name author of the bucketlist.
+        :param name: A string representing the name of the bucketlist.
+        :param created_by: An integer representing the id of the bucketlist's author.
+        """
         self.name = name
         self.created_by = created_by
 
     def save(self):
+        """Saves a bucketlist into the database.
+        Could be editing a new bucketlist or editing a pre existing one."""
         db.session.add(self)
         db.session.commit()
 
     @staticmethod
     def get_all():
+        """Fetches all the bucketlists from the database"""
         return BucketList.query.all()
 
     def delete(self):
@@ -138,16 +144,23 @@ class BucketListItem(db.Model):
     bucketlist_id = db.Column(db.Integer, db.ForeignKey(BucketList.id))
 
     def __init__(self, name, bucketlist_id):
-        """Initialize with name and bucketlist_id"""
+        """
+        Initializes bucketlist item.
+        :param name: A string representing the name of the bucketlist item.
+        :param bucketlist_id: A unique integer identifier for the bucketlist item.
+        """
         self.name = name
         self.bucketlist_id = bucketlist_id
 
     def save(self):
+        """Saves all the bucktlist items to the database."""
         db.session.add(self)
         db.session.commit()
 
     @staticmethod
     def get_all_items():
+        """Method retrieves bucketlist item from the database
+        based on the bucketlist id."""
         return BucketListItem.query.filter_by(bucketlist_id=BucketList.id)
 
     def delete(self):
