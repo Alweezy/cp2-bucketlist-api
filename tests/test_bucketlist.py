@@ -1,7 +1,9 @@
 import unittest
 import json
 
-from app import create_app, db
+from app import db
+from app.app import app
+from instance.config import app_config
 
 
 class BucketListTestCase(unittest.TestCase):
@@ -9,7 +11,9 @@ class BucketListTestCase(unittest.TestCase):
 
     def setUp(self):
         """Define test variables and initialize app."""
-        self.app = create_app(config_name="testing")
+        app.config.from_object(app_config["testing"])
+        app.config.from_pyfile('config.py')
+        self.app = app
         self.client = self.app.test_client
         self.bucketlist = {'name': 'Go Skiing in the Himalayas'}
         self.bucketlist2 = {'name': 'Attend a BBQ at the Dojo'}
