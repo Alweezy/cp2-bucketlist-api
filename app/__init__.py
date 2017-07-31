@@ -10,6 +10,11 @@ db = SQLAlchemy()
 
 
 def create_app(config_name):
+    """creates an app instance
+    :param config_name: The name of the confiuration;
+    whether development, staging or production.
+    :return: app
+    """
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.url_map.strict_slashes = False
     app.config.from_object(app_config[config_name])

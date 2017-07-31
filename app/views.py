@@ -13,6 +13,9 @@ def index():
 @app.route('/api/v1/bucketlists/', methods=['POST', 'GET'])
 @evaluate_auth
 def bucketlists(user_id):
+    """A view for the creation and  retrieval of a database.
+    :param user_id: An integer representing the creator/owner of bucketlist.
+    """
     if request.method == "POST":
         name = str(request.data.get('name', ''))
         if name:
@@ -135,6 +138,10 @@ def bucketlists(user_id):
 @app.route('/api/v1/bucketlists/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 @evaluate_auth
 def bucketlist_manipulation(id, user_id, *args, **kwargs):
+    """A view for the manipulation(retrieval, editing and deleting of a bucketlist.)
+    :param id: An integer identifier of the database.
+    :param user_id: An integer identifier for the bucketlist author.
+    """
     # retrieve a buckelist using it's ID
     bucketlist = BucketList.query.filter_by(id=id, created_by=user_id).first()
     if not bucketlist:
@@ -190,6 +197,11 @@ def bucketlist_manipulation(id, user_id, *args, **kwargs):
 @app.route('/api/v1/bucketlists/<int:id>/items/', methods=['GET', 'POST'])
 @evaluate_auth
 def bucketlist_items(id, user_id, *args, **kwargs):
+    """A view for the creation and retrieval of bucketlist items
+    :param id: A unique integer identifier for the bucketlist item.
+    :param user_id: A unique integer identifier for the author of the
+     bucketlist item.
+    """
     bucketlist = BucketList.query.filter_by(id=id, created_by=user_id).first()
     if not bucketlist:
         abort(jsonify({"message": "Bucketlist does not exist."}))
@@ -229,6 +241,11 @@ def bucketlist_items(id, user_id, *args, **kwargs):
 @app.route('/api/v1/bucketlists/<int:id>/items/<int:item_id>', methods=['GET', 'PUT', 'DELETE'])
 @evaluate_auth
 def bucketlist_item_manipulation(id, item_id, user_id, *atgs, **kwargs):
+    """A view for the manipulation(retrieval, updating and deletion of bucketlist item).
+    :param id: A unique integer identifier for the bucketlist item.
+    :param item_id: A unique integer identifier for linking bucketlist item to the author.
+    :param user_id: A unique integer identifier for the item's author.
+    """
     user = BucketList.query.filter_by(created_by=user_id).first()
     if not user:
         abort(jsonify({"message": "Bucketlist item does not exist or you don't own it."}))
