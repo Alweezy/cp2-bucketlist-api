@@ -36,7 +36,7 @@ Alternatively you can create it using virtualenvwarapper if installed:
 ```
 $ mkvirtualenv --python=python3.6 virtualenv-name
 ```
-> It will be automatically activated, in the future to use it just type
+> It will be automatically activated, in the future to use it just type:
 ```
 $ workon virtualenv-name
 ```
@@ -54,3 +54,21 @@ $  python manage.py db upgrade
 ```
 
 ### Api Endpoints
+```
+
+| Endpoint | Functionality |
+| -------- | ------------- |
+| POST /auth/login | Logs a user in |
+| POST /auth/register | Register a user |
+| POST /bucketlists/ | Create a new bucket list |
+| GET /bucketlists/	| List all the created bucket lists |
+| GET /bucketlists/<id> | Get single bucket list |
+| PUT /bucketlists/<id> | Update this bucket list |
+| DELETE /bucketlists/<id> | Delete this single bucket list |
+| GET /bucketlists/<id>/items/<item_id> | Get a single bucket list item |
+| POST /bucketlists/<id>/items/ | Create a new item in bucket list |
+| PUT /bucketlists/<id>/items/<item_id> | Update a bucket list item |```
+
+###Lincense
+This project is licensed with the [MIT LICENCE]: https://opensource.org/licenses/MIT
+
