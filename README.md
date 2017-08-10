@@ -54,7 +54,6 @@ $  python manage.py db upgrade
 ```
 
 ### Api Endpoints
-```
 
 | Endpoint | Functionality |
 | -------- | ------------- |
@@ -70,6 +69,7 @@ $  python manage.py db upgrade
 | PUT /bucketlists/<id>/items/<item_id> | Update a bucket list item |
 
 
-###Lincense
+
+### Lincense
 This project is licensed with the [MIT LICENCE]: https://opensource.org/licenses/MIT
 
