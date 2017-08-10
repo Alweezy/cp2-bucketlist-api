@@ -71,5 +71,5 @@ $  python manage.py db upgrade
 
 
 ### Lincense
-This project is licensed with the [MIT LICENCE]: https://opensource.org/licenses/MIT
+This project is distributed with the [MIT LICENCE](https://opensource.org/licenses/MIT)
 
