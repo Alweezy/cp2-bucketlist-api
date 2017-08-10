@@ -67,7 +67,8 @@ $  python manage.py db upgrade
 | DELETE /bucketlists/<id> | Delete this single bucket list |
 | GET /bucketlists/<id>/items/<item_id> | Get a single bucket list item |
 | POST /bucketlists/<id>/items/ | Create a new item in bucket list |
-| PUT /bucketlists/<id>/items/<item_id> | Update a bucket list item |```
+| PUT /bucketlists/<id>/items/<item_id> | Update a bucket list item |
+
 
 ###Lincense
 This project is licensed with the [MIT LICENCE]: https://opensource.org/licenses/MIT
