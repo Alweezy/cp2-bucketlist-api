@@ -1,7 +1,7 @@
+import os
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
-import os
-
+from flask_cors import CORS, cross_origin
 
 from instance.config import app_config
 
@@ -16,6 +16,7 @@ def create_app(config_name):
     :return: app
     """
     app = FlaskAPI(__name__, instance_relative_config=True)
+    CORS(app)
     app.url_map.strict_slashes = False
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
