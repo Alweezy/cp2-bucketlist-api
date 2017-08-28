@@ -68,7 +68,7 @@ def bucketlists(user_id):
                     }
                     search_results.append(bucketlist_data)
 
-                return make_response(jsonify(search_results)), 200
+                return make_response(jsonify({"bucketlists": search_results})), 200
             else:
                 res = {
                     "message": "Specified bucketlist is not available"
