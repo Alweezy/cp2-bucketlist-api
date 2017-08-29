@@ -28,6 +28,7 @@ def bucketlists(user_id):
                     'name': bucketlist.name,
                     'date_created': bucketlist.date_created,
                     'date_modified': bucketlist.date_modified,
+                    'items': [],
                     'created_by': user_id
                 }
                 return make_response(jsonify({"bucketlists": response})), 201
