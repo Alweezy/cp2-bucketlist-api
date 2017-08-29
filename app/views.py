@@ -31,7 +31,7 @@ def bucketlists(user_id):
                     'created_by': user_id
                 })
                 response.status_code = 201
-                return response
+                return make_response(jsonify({"bucketlists": response})), 200
             else:
                 res = {
                     "message": "User already has a bucketlist by that name"
