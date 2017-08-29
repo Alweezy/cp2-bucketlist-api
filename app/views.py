@@ -23,13 +23,13 @@ def bucketlists(user_id):
             if not bucketlist:
                 bucketlist = BucketList(name=name, created_by=user_id)
                 bucketlist.save()
-                response = jsonify({
+                response = {
                     'id': bucketlist.id,
                     'name': bucketlist.name,
                     'date_created': bucketlist.date_created,
                     'date_modified': bucketlist.date_modified,
                     'created_by': user_id
-                })
+                }
                 return make_response(jsonify({"bucketlists": response})), 201
             else:
                 res = {
